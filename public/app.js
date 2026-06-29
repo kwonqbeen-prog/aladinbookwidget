@@ -75,7 +75,7 @@ function renderResults(items) {
     const el = document.createElement('div');
     el.className = 'book-item';
     el.innerHTML = `
-      <img class="book-cover" src="${esc(item.cover)}" alt="${esc(item.title)}" loading="lazy" data-src="${esc(item.cover)}" />
+      <img class="book-cover" src="${esc(item.cover)}" alt="${esc(item.title)}" loading="lazy" />
       <div class="book-info">
         <div class="book-title">${esc(item.title)}</div>
         <div class="book-meta">${esc(meta)}</div>
@@ -96,18 +96,6 @@ function renderResults(items) {
       publisher: item.publisher,
       pubDate: item.pubDate,
       cover: item.cover,
-    };
-
-    // 커버 이미지 폴백: coverxlarge → cover500x → cover200x
-    const imgEl = el.querySelector('.book-cover');
-    imgEl.onerror = () => {
-      const src = imgEl.src;
-      if (src.includes('coverxlarge')) {
-        imgEl.src = src.replace('coverxlarge', 'cover500x');
-      } else if (src.includes('cover500x')) {
-        imgEl.src = src.replace('cover500x', 'cover200x');
-        imgEl.onerror = null;
-      }
     };
 
     const [wishBtn, readBtn] = el.querySelectorAll('.save-btn');
