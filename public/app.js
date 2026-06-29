@@ -50,13 +50,13 @@ function parseAuthor(raw) {
     if (!m) continue;
     const name = m[1].trim();
     const roleRaw = m[2].trim();
-    const suffix = Object.keys(roleMap).find(k => roleRaw.includes(k));
-    if (suffix) out.push(`${name} ${roleMap[suffix]}`);
+    const key = Object.keys(roleMap).find(k => roleRaw.includes(k));
+    if (key) out.push(`${name} ${roleMap[key]}`);
   }
 
-  if (out.length) return out.join(', ');
-  // fallback: return first name without role annotation
-  return raw.split(',')[0]?.split('(')[0]?.trim() || raw;
+  return out.length
+    ? out.join(', ')
+    : (raw.split(',')[0]?.split('(')[0]?.trim() || raw);
 }
 
 function renderResults(items) {
@@ -80,48 +80,57 @@ function renderResults(items) {
         <div class="book-title">${esc(item.title)}</div>
         <div class="book-meta">${esc(meta)}</div>
       </div>
-      <button class="save-btn">저장</button>
+      <div class="save-btns">
+        <button class="icon-btn save-btn" title="위시리스트에 추가">
+          <span class="material-symbols-rounded">bookmark</span>
+        </button>
+        <button class="icon-btn save-btn" title="읽은 책에 추가">
+          <span class="material-symbols-rounded">auto_stories</span>
+        </button>
+      </div>
     `;
 
-    el.querySelector('.save-btn').addEventListener('click', () => {
-      saveBook(el.querySelector('.save-btn'), {
-        title: item.title,
-        author: authorText,
-        publisher: item.publisher,
-        pubDate: item.pubDate,
-        cover: item.cover,
-      });
-    });
+    const bookData = {
+      title: item.title,
+      author: authorText,
+      publisher: item.publisher,
+      pubDate: item.pubDate,
+      cover: item.cover,
+    };
+
+    const [wishBtn, readBtn] = el.querySelectorAll('.save-btn');
+    wishBtn.addEventListener('click', () => saveBook(wishBtn, bookData, '위시리스트'));
+    readBtn.addEventListener('click', () => saveBook(readBtn, bookData, '읽은 책'));
 
     resultsEl.appendChild(el);
   }
 }
 
-async function saveBook(btn, book) {
+async function saveBook(btn, book, status) {
   if (btn.disabled) return;
-  btn.disabled = true;
-  btn.textContent = '저장 중';
+
+  const allBtns = [...btn.closest('.save-btns').querySelectorAll('.save-btn')];
+  allBtns.forEach(b => b.disabled = true);
 
   try {
     const res = await fetch(`${API_BASE}/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(book),
+      body: JSON.stringify({ ...book, status }),
     });
     const data = await res.json();
 
     if (data.success) {
-      btn.textContent = '저장됨';
       btn.classList.add('saved');
-      showToast('노션에 저장했습니다');
+      // 다른 버튼은 다시 활성화 (상태 수정 가능하도록)
+      allBtns.forEach(b => { if (b !== btn) b.disabled = false; });
+      showToast(status === '위시리스트' ? '위시리스트에 저장했습니다' : '읽은 책에 저장했습니다');
     } else {
-      btn.disabled = false;
-      btn.textContent = '저장';
+      allBtns.forEach(b => b.disabled = false);
       showToast(data.error || '저장에 실패했습니다');
     }
   } catch {
-    btn.disabled = false;
-    btn.textContent = '저장';
+    allBtns.forEach(b => b.disabled = false);
     showToast('네트워크 오류가 발생했습니다');
   }
 }

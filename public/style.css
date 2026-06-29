@@ -4,8 +4,6 @@
   --input-bg: #f0efed;
   --input-focus: #e9e8e5;
   --hover-bg: rgba(55, 53, 47, 0.06);
-  --save-bg: rgba(55, 53, 47, 0.08);
-  --save-hover: rgba(55, 53, 47, 0.16);
   --save-ok: #2f9e44;
   --toast-bg: #37352f;
   --toast-text: #ffffff;
@@ -18,8 +16,6 @@
     --input-bg: #2f3437;
     --input-focus: #373b3e;
     --hover-bg: rgba(255, 255, 255, 0.055);
-    --save-bg: rgba(255, 255, 255, 0.1);
-    --save-hover: rgba(255, 255, 255, 0.18);
     --save-ok: #51cf66;
     --toast-bg: #fffffe;
     --toast-text: #37352f;
@@ -33,16 +29,24 @@
 }
 
 html, body {
-  width: 100%;
+  height: 100%;
 }
 
 body {
+  overflow: hidden;
   font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
   font-size: 14px;
   line-height: 1.5;
   color: var(--text);
   background: transparent;
-  padding: 14px 18px 24px;
+  padding: 14px 18px 16px;
+}
+
+/* ── Layout ── */
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Title ── */
@@ -51,16 +55,25 @@ body {
   font-weight: 600;
   margin-bottom: 10px;
   letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
 
-/* ── Search bar ── */
+/* ── Search row ── */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
 .search-bar {
+  flex: 1;
   display: flex;
   align-items: center;
   background: var(--input-bg);
   border-radius: 999px;
-  padding: 4px 4px 4px 14px;
-  margin-bottom: 12px;
+  padding: 5px 14px;
   transition: background 0.15s;
 }
 
@@ -69,8 +82,7 @@ body {
 }
 
 #search-input {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   border: none;
   background: transparent;
   outline: none;
@@ -80,12 +92,13 @@ body {
   caret-color: var(--text);
 }
 
-.search-btn {
+/* ── Icon buttons (search + save) ── */
+.icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   border: none;
   border-radius: 50%;
@@ -93,30 +106,37 @@ body {
   cursor: pointer;
   color: var(--text-sub);
   transition: background 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.search-btn:hover {
+.icon-btn:hover {
   background: var(--hover-bg);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.search-btn:active {
+.icon-btn:active {
   background: var(--hover-bg);
 }
 
+.icon-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
 .material-symbols-rounded {
-  font-size: 18px;
-  font-variation-settings: 'opsz' 20, 'wght' 400, 'FILL' 0, 'GRAD' 0;
+  font-size: 20px;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
   user-select: none;
 }
 
 /* ── Results ── */
 .results {
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: calc(100vh - 100px);
   scrollbar-width: none;
   -ms-overflow-style: none;
+  min-height: 0;
 }
 
 .results::-webkit-scrollbar {
@@ -134,8 +154,8 @@ body {
 .book-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 6px;
+  gap: 10px;
+  padding: 6px 4px;
   border-radius: 4px;
   transition: background 0.1s;
 }
@@ -176,38 +196,29 @@ body {
   text-overflow: ellipsis;
 }
 
-/* ── Save button ── */
-.save-btn {
+/* ── Save buttons ── */
+.save-btns {
+  display: flex;
+  gap: 2px;
   flex-shrink: 0;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-family: inherit;
-  font-weight: 500;
-  color: var(--text-sub);
-  background: var(--save-bg);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
 }
 
-.save-btn:hover:not(:disabled) {
-  background: var(--save-hover);
-}
-
-.save-btn:disabled {
-  cursor: default;
+.save-btn .material-symbols-rounded {
+  font-size: 18px;
 }
 
 .save-btn.saved {
   color: var(--save-ok);
 }
 
+.save-btn.saved .material-symbols-rounded {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
 /* ── Toast ── */
 .toast {
   position: fixed;
-  bottom: 16px;
+  bottom: 14px;
   left: 50%;
   transform: translateX(-50%) translateY(6px);
   background: var(--toast-bg);

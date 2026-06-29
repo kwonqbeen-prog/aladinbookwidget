@@ -1,12 +1,18 @@
 // Notion DB property names — must match your database column names exactly.
-// Title column: "제목" (the main title property)
-// Other columns to create in Notion: 저자 (텍스트), 출판사 (텍스트), 출판연도 (숫자), 표지 (파일과 미디어)
+// Properties to create in Notion:
+//   제목      → 제목 (기본 title 속성)
+//   저자      → 텍스트
+//   출판사    → 텍스트
+//   출판연도  → 텍스트
+//   표지      → 파일과 미디어
+//   독서 상태 → 선택 (옵션: 위시리스트 / 읽은 책)
 const PROPS = {
   title: '제목',
   author: '저자',
   publisher: '출판사',
   year: '출판연도',
   cover: '표지',
+  status: '독서 상태',
 };
 
 export default async function handler(req, res) {
@@ -23,10 +29,10 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Notion credentials not configured' });
   }
 
-  const { title, author, publisher, pubDate, cover } = req.body || {};
+  const { title, author, publisher, pubDate, cover, status } = req.body || {};
   if (!title) return res.status(400).json({ error: 'title is required' });
 
-  const year = pubDate ? parseInt(pubDate.substring(0, 4), 10) : null;
+  const year = pubDate ? pubDate.substring(0, 4) : null;
 
   const properties = {
     [PROPS.title]: {
@@ -39,12 +45,15 @@ export default async function handler(req, res) {
       [PROPS.publisher]: { rich_text: [{ text: { content: publisher } }] },
     }),
     ...(year && {
-      [PROPS.year]: { number: year },
+      [PROPS.year]: { rich_text: [{ text: { content: year } }] },
     }),
     ...(cover && {
       [PROPS.cover]: {
         files: [{ name: 'cover', type: 'external', external: { url: cover } }],
       },
+    }),
+    ...(status && {
+      [PROPS.status]: { select: { name: status } },
     }),
   };
 
