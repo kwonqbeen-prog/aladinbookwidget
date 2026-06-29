@@ -1,3 +1,229 @@
-/* placeholder — 디자인 확정 후 작성 */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: sans-serif; }
+:root {
+  --text: #37352f;
+  --text-sub: #787774;
+  --input-bg: #f0efed;
+  --input-focus: #e9e8e5;
+  --hover-bg: rgba(55, 53, 47, 0.06);
+  --save-bg: rgba(55, 53, 47, 0.08);
+  --save-hover: rgba(55, 53, 47, 0.16);
+  --save-ok: #2f9e44;
+  --toast-bg: #37352f;
+  --toast-text: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #fffffe;
+    --text-sub: #9b9a97;
+    --input-bg: #2f3437;
+    --input-focus: #373b3e;
+    --hover-bg: rgba(255, 255, 255, 0.055);
+    --save-bg: rgba(255, 255, 255, 0.1);
+    --save-hover: rgba(255, 255, 255, 0.18);
+    --save-ok: #51cf66;
+    --toast-bg: #fffffe;
+    --toast-text: #37352f;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+}
+
+body {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: transparent;
+  padding: 14px 18px 24px;
+}
+
+/* ── Title ── */
+.widget-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+/* ── Search bar ── */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--input-bg);
+  border-radius: 999px;
+  padding: 4px 4px 4px 14px;
+  margin-bottom: 12px;
+  transition: background 0.15s;
+}
+
+.search-bar:focus-within {
+  background: var(--input-focus);
+}
+
+#search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  caret-color: var(--text);
+}
+
+.search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-sub);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.search-btn:hover {
+  background: var(--hover-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.search-btn:active {
+  background: var(--hover-bg);
+}
+
+.material-symbols-rounded {
+  font-size: 18px;
+  font-variation-settings: 'opsz' 20, 'wght' 400, 'FILL' 0, 'GRAD' 0;
+  user-select: none;
+}
+
+/* ── Results ── */
+.results {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 100px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.results::-webkit-scrollbar {
+  display: none;
+}
+
+.state-msg {
+  font-size: 13px;
+  color: var(--text-sub);
+  padding: 24px 0;
+  text-align: center;
+}
+
+/* ── Book item ── */
+.book-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+
+.book-item:hover {
+  background: var(--hover-bg);
+}
+
+.book-cover {
+  width: 42px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--input-bg);
+}
+
+.book-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.book-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-meta {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Save button ── */
+.save-btn {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--text-sub);
+  background: var(--save-bg);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: var(--save-hover);
+}
+
+.save-btn:disabled {
+  cursor: default;
+}
+
+.save-btn.saved {
+  color: var(--save-ok);
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+  z-index: 100;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

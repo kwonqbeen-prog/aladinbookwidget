@@ -1,47 +1,142 @@
-// placeholder — 기능 확정 후 작성
 const API_BASE = '/api';
 
-document.getElementById('search-btn').addEventListener('click', search);
-document.getElementById('search-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') search();
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const resultsEl = document.getElementById('results');
+const toastEl = document.getElementById('toast');
+
+let toastTimer = null;
+
+searchBtn.addEventListener('click', doSearch);
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
 });
 
-async function search() {
-  const query = document.getElementById('search-input').value.trim();
-  const queryType = document.getElementById('query-type').value;
+async function doSearch() {
+  const query = searchInput.value.trim();
   if (!query) return;
 
-  const res = await fetch(`${API_BASE}/search?query=${encodeURIComponent(query)}&queryType=${queryType}`);
-  const data = await res.json();
-  renderResults(data.item || []);
+  resultsEl.innerHTML = '<p class="state-msg">검색 중…</p>';
+
+  try {
+    const res = await fetch(`${API_BASE}/search?query=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      resultsEl.innerHTML = '';
+      showToast(data.error || '검색에 실패했습니다');
+      return;
+    }
+
+    renderResults(data.items || []);
+  } catch {
+    resultsEl.innerHTML = '';
+    showToast('네트워크 오류가 발생했습니다');
+  }
+}
+
+// "홍길동 (지은이), 김철수 (옮긴이), 이영희 (해설)" → "홍길동 저, 김철수 역"
+function parseAuthor(raw) {
+  if (!raw) return '';
+  const roleMap = {
+    지은이: '저', 저자: '저', 글: '저',
+    옮긴이: '역', 역자: '역', 번역: '역', 편역: '편역',
+  };
+  const parts = raw.split(',').map(s => s.trim());
+  const out = [];
+
+  for (const part of parts) {
+    const m = part.match(/^(.+?)\s*[(\[](.+?)[)\]]$/);
+    if (!m) continue;
+    const name = m[1].trim();
+    const roleRaw = m[2].trim();
+    const suffix = Object.keys(roleMap).find(k => roleRaw.includes(k));
+    if (suffix) out.push(`${name} ${roleMap[suffix]}`);
+  }
+
+  if (out.length) return out.join(', ');
+  // fallback: return first name without role annotation
+  return raw.split(',')[0]?.split('(')[0]?.trim() || raw;
 }
 
 function renderResults(items) {
-  const container = document.getElementById('results');
-  container.innerHTML = '';
-  items.forEach(item => {
+  if (!items.length) {
+    resultsEl.innerHTML = '<p class="state-msg">검색 결과가 없습니다</p>';
+    return;
+  }
+
+  resultsEl.innerHTML = '';
+
+  for (const item of items) {
+    const authorText = parseAuthor(item.author);
+    const year = item.pubDate?.substring(0, 4) || '';
+    const meta = [authorText, item.publisher, year].filter(Boolean).join(' · ');
+
     const el = document.createElement('div');
-    el.className = 'book-card';
+    el.className = 'book-item';
     el.innerHTML = `
-      <img src="${item.cover}" alt="표지" />
-      <div>
-        <p class="title">${item.title}</p>
-        <p class="author">${item.author}</p>
-        <p class="publisher">${item.publisher} · ${item.pubDate}</p>
-        <button onclick='saveToNotion(${JSON.stringify(item)})'>노션에 저장</button>
+      <img class="book-cover" src="${esc(item.cover)}" alt="${esc(item.title)}" loading="lazy" />
+      <div class="book-info">
+        <div class="book-title">${esc(item.title)}</div>
+        <div class="book-meta">${esc(meta)}</div>
       </div>
+      <button class="save-btn">저장</button>
     `;
-    container.appendChild(el);
-  });
+
+    el.querySelector('.save-btn').addEventListener('click', () => {
+      saveBook(el.querySelector('.save-btn'), {
+        title: item.title,
+        author: authorText,
+        publisher: item.publisher,
+        pubDate: item.pubDate,
+        cover: item.cover,
+      });
+    });
+
+    resultsEl.appendChild(el);
+  }
 }
 
-async function saveToNotion(book) {
-  const res = await fetch(`${API_BASE}/save`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(book),
-  });
-  const data = await res.json();
-  if (data.success) alert('저장 완료!');
-  else alert('저장 실패: ' + data.error);
+async function saveBook(btn, book) {
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '저장 중';
+
+  try {
+    const res = await fetch(`${API_BASE}/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(book),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      btn.textContent = '저장됨';
+      btn.classList.add('saved');
+      showToast('노션에 저장했습니다');
+    } else {
+      btn.disabled = false;
+      btn.textContent = '저장';
+      showToast(data.error || '저장에 실패했습니다');
+    }
+  } catch {
+    btn.disabled = false;
+    btn.textContent = '저장';
+    showToast('네트워크 오류가 발생했습니다');
+  }
+}
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2500);
+}
+
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
