@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>알라딘 도서 검색</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="widget-header">
+      <h1>📚 도서 검색</h1>
+    </header>
+
+    <div class="search-area">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="책 제목, 저자, ISBN을 입력하세요"
+        autocomplete="off"
+      />
+      <select id="query-type">
+        <option value="Keyword">통합검색</option>
+        <option value="Title">제목</option>
+        <option value="Author">저자</option>
+        <option value="ISBN">ISBN</option>
+      </select>
+      <button id="search-btn">검색</button>
+    </div>
+
+    <div id="results" class="results-area"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
