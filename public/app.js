@@ -75,7 +75,7 @@ function renderResults(items) {
     const el = document.createElement('div');
     el.className = 'book-item';
     el.innerHTML = `
-      <img class="book-cover" src="${esc(item.cover)}" alt="${esc(item.title)}" loading="lazy" />
+      <img class="book-cover" src="${esc(item.cover)}" alt="${esc(item.title)}" loading="lazy" data-src="${esc(item.cover)}" />
       <div class="book-info">
         <div class="book-title">${esc(item.title)}</div>
         <div class="book-meta">${esc(meta)}</div>
@@ -98,6 +98,18 @@ function renderResults(items) {
       cover: item.cover,
     };
 
+    // 커버 이미지 폴백: coverxlarge → cover500x → cover200x
+    const imgEl = el.querySelector('.book-cover');
+    imgEl.onerror = () => {
+      const src = imgEl.src;
+      if (src.includes('coverxlarge')) {
+        imgEl.src = src.replace('coverxlarge', 'cover500x');
+      } else if (src.includes('cover500x')) {
+        imgEl.src = src.replace('cover500x', 'cover200x');
+        imgEl.onerror = null;
+      }
+    };
+
     const [wishBtn, readBtn] = el.querySelectorAll('.save-btn');
     wishBtn.addEventListener('click', () => saveBook(bookData, '위시리스트'));
     readBtn.addEventListener('click', () => saveBook(bookData, '읽은 책'));
@@ -107,11 +119,12 @@ function renderResults(items) {
 }
 
 async function saveBook(book, status) {
+  const date = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD (현지 날짜)
   try {
     const res = await fetch(`${API_BASE}/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...book, status }),
+      body: JSON.stringify({ ...book, status, date }),
     });
     const data = await res.json();
 

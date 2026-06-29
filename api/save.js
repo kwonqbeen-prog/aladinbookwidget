@@ -6,6 +6,7 @@
 //   출판연도  → 텍스트
 //   표지      → 파일과 미디어
 //   상태      → 선택 (옵션: 위시리스트 / 읽은 책)
+//   날짜      → 날짜
 const PROPS = {
   title: '제목',
   author: '저자',
@@ -13,6 +14,7 @@ const PROPS = {
   year: '출판연도',
   cover: '표지',
   status: '상태',
+  date: '날짜',
 };
 
 export default async function handler(req, res) {
@@ -29,7 +31,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Notion credentials not configured' });
   }
 
-  const { title, author, publisher, pubDate, cover, status } = req.body || {};
+  const { title, author, publisher, pubDate, cover, status, date } = req.body || {};
   if (!title) return res.status(400).json({ error: 'title is required' });
 
   const year = pubDate ? pubDate.substring(0, 4) : null;
@@ -54,6 +56,9 @@ export default async function handler(req, res) {
     }),
     ...(status && {
       [PROPS.status]: { select: { name: status } },
+    }),
+    ...(date && {
+      [PROPS.date]: { date: { start: date } },
     }),
   };
 

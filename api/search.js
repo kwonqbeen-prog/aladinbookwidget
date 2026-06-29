@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         author: item.author,
         publisher: item.publisher,
         pubDate: item.pubDate,
-        cover: (item.cover || '').replace(/cover\d+x/, 'cover500x'),
+        cover: (item.cover || '').replace(/cover\d+x(?=\.jpg)/i, 'coverxlarge'),
         isbn13: item.isbn13 || item.isbn,
         link: item.link,
       })),
