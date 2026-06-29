@@ -82,10 +82,10 @@ function renderResults(items) {
       </div>
       <div class="save-btns">
         <button class="icon-btn save-btn" title="위시리스트에 추가">
-          <span class="material-symbols-rounded">bookmark</span>
+          <span class="material-symbols-rounded">favorite</span>
         </button>
         <button class="icon-btn save-btn" title="읽은 책에 추가">
-          <span class="material-symbols-rounded">auto_stories</span>
+          <span class="material-symbols-rounded">bookmark</span>
         </button>
       </div>
     `;
@@ -99,19 +99,14 @@ function renderResults(items) {
     };
 
     const [wishBtn, readBtn] = el.querySelectorAll('.save-btn');
-    wishBtn.addEventListener('click', () => saveBook(wishBtn, bookData, '위시리스트'));
-    readBtn.addEventListener('click', () => saveBook(readBtn, bookData, '읽은 책'));
+    wishBtn.addEventListener('click', () => saveBook(bookData, '위시리스트'));
+    readBtn.addEventListener('click', () => saveBook(bookData, '읽은 책'));
 
     resultsEl.appendChild(el);
   }
 }
 
-async function saveBook(btn, book, status) {
-  if (btn.disabled) return;
-
-  const allBtns = [...btn.closest('.save-btns').querySelectorAll('.save-btn')];
-  allBtns.forEach(b => b.disabled = true);
-
+async function saveBook(book, status) {
   try {
     const res = await fetch(`${API_BASE}/save`, {
       method: 'POST',
@@ -121,16 +116,11 @@ async function saveBook(btn, book, status) {
     const data = await res.json();
 
     if (data.success) {
-      btn.classList.add('saved');
-      // 다른 버튼은 다시 활성화 (상태 수정 가능하도록)
-      allBtns.forEach(b => { if (b !== btn) b.disabled = false; });
       showToast(status === '위시리스트' ? '위시리스트에 저장했습니다' : '읽은 책에 저장했습니다');
     } else {
-      allBtns.forEach(b => b.disabled = false);
       showToast(data.error || '저장에 실패했습니다');
     }
   } catch {
-    allBtns.forEach(b => b.disabled = false);
     showToast('네트워크 오류가 발생했습니다');
   }
 }

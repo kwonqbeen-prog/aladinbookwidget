@@ -5,14 +5,14 @@
 //   출판사    → 텍스트
 //   출판연도  → 텍스트
 //   표지      → 파일과 미디어
-//   독서 상태 → 선택 (옵션: 위시리스트 / 읽은 책)
+//   상태      → 선택 (옵션: 위시리스트 / 읽은 책)
 const PROPS = {
   title: '제목',
   author: '저자',
   publisher: '출판사',
   year: '출판연도',
   cover: '표지',
-  status: '독서 상태',
+  status: '상태',
 };
 
 export default async function handler(req, res) {

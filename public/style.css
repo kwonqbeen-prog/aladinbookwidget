@@ -4,7 +4,6 @@
   --input-bg: #f0efed;
   --input-focus: #e9e8e5;
   --hover-bg: rgba(55, 53, 47, 0.06);
-  --save-ok: #2f9e44;
   --toast-bg: #37352f;
   --toast-text: #ffffff;
 }
@@ -16,7 +15,6 @@
     --input-bg: #2f3437;
     --input-focus: #373b3e;
     --hover-bg: rgba(255, 255, 255, 0.055);
-    --save-ok: #51cf66;
     --toast-bg: #fffffe;
     --toast-text: #37352f;
   }
@@ -35,11 +33,11 @@ html, body {
 body {
   overflow: hidden;
   font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
   color: var(--text);
   background: transparent;
-  padding: 14px 18px 16px;
+  padding: 16px 20px 20px;
 }
 
 /* ── Layout ── */
@@ -51,9 +49,9 @@ body {
 
 /* ── Title ── */
 .widget-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
   letter-spacing: -0.01em;
   flex-shrink: 0;
 }
@@ -62,8 +60,8 @@ body {
 .search-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 14px;
   flex-shrink: 0;
 }
 
@@ -73,7 +71,7 @@ body {
   align-items: center;
   background: var(--input-bg);
   border-radius: 999px;
-  padding: 5px 14px;
+  padding: 9px 18px;
   transition: background 0.15s;
 }
 
@@ -87,7 +85,7 @@ body {
   background: transparent;
   outline: none;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text);
   caret-color: var(--text);
 }
@@ -97,8 +95,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
   border: none;
   border-radius: 50%;
@@ -118,13 +116,8 @@ body {
   background: var(--hover-bg);
 }
 
-.icon-btn:disabled {
-  cursor: default;
-  opacity: 0.4;
-}
-
 .material-symbols-rounded {
-  font-size: 20px;
+  font-size: 22px;
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
   user-select: none;
 }
@@ -144,9 +137,9 @@ body {
 }
 
 .state-msg {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-sub);
-  padding: 24px 0;
+  padding: 28px 0;
   text-align: center;
 }
 
@@ -154,8 +147,8 @@ body {
 .book-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 4px;
+  gap: 14px;
+  padding: 10px 6px;
   border-radius: 4px;
   transition: background 0.1s;
 }
@@ -165,8 +158,8 @@ body {
 }
 
 .book-cover {
-  width: 42px;
-  height: 60px;
+  width: 56px;
+  height: 80px;
   object-fit: cover;
   border-radius: 2px;
   flex-shrink: 0;
@@ -179,7 +172,7 @@ body {
 }
 
 .book-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text);
   white-space: nowrap;
@@ -188,9 +181,9 @@ body {
 }
 
 .book-meta {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-sub);
-  margin-top: 2px;
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -204,15 +197,7 @@ body {
 }
 
 .save-btn .material-symbols-rounded {
-  font-size: 18px;
-}
-
-.save-btn.saved {
-  color: var(--save-ok);
-}
-
-.save-btn.saved .material-symbols-rounded {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  font-size: 20px;
 }
 
 /* ── Toast ── */
